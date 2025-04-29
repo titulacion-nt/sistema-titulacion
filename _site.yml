@@ -1,0 +1,9 @@
+name: "Sistema de Titulación"
+navbar:
+  title: "Sistema de Titulación"
+  left:
+    - text: "Inicio"
+      href: index.html
+    - text: "Administrador"
+      href: admin_titulacion.html
+output_dir: "docs"  # Cambia esto según la carpeta deseada para los archivos generados

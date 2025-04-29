@@ -1,0 +1,65 @@
+---
+title: "Administrador - Sistema de Titulación"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+# Cargar librerías necesarias
+library(shiny)
+library(DT)
+library(openxlsx) # Para descargar registros en Excel
+```
+
+### Panel del Administrador
+
+```{r}
+# Interfaz de usuario
+fluidPage(
+  titlePanel("Panel del Administrador"),
+  
+  sidebarLayout(
+    sidebarPanel(
+      h3("Opciones"),
+      downloadButton("descargar", "Descargar Registros", class = "btn-success")
+    ),
+    
+    mainPanel(
+      h3("Estudiantes Registrados"),
+      DTOutput("tabla_registro")
+    )
+  )
+)
+```
+
+```{r server, include=FALSE}
+# Lógica del servidor
+server <- function(input, output, session) {
+  # Base de datos ficticia (puedes usar una base de datos real en el futuro)
+  datos <- reactiveValues(registro = data.frame(
+    Nombre = c("Juan Pérez", "Ana Gómez"),
+    Cedula = c("1234567890", "0987654321"),
+    Email = c("juan@example.com", "ana@example.com"),
+    Carrera = c("Mecatrónica", "Contabilidad"),
+    stringsAsFactors = FALSE
+  ))
+  
+  # Mostrar tabla de estudiantes registrados
+  output$tabla_registro <- renderDT({
+    datatable(datos$registro, options = list(pageLength = 5))
+  })
+  
+  # Descargar registros en formato Excel
+  output$descargar <- downloadHandler(
+    filename = function() {
+      paste("registros_estudiantes_", Sys.Date(), ".xlsx", sep = "")
+    },
+    content = function(file) {
+      write.xlsx(datos$registro, file)
+    }
+  )
+}
+```

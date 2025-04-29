@@ -1,0 +1,104 @@
+---
+title: "Sistema de Titulación - Registro de Estudiantes"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+runtime: shiny
+---
+
+```{r setup_librerias, include=FALSE} 
+# Cambié el nombre del chunk a "setup_librerias"
+# Librerías necesarias
+library(shiny)
+library(DT)
+```
+
+
+
+### Registro de Estudiantes y Encuesta
+
+```{r}
+# Interfaz de usuario
+fluidPage(
+  titlePanel("Registro de Estudiantes"),
+  
+  tabsetPanel(id = "tabs",  # Asignar ID a las pestañas para controlarlas dinámicamente
+    # Pestaña 1: Registro de Estudiantes
+    tabPanel("Registro",
+      fluidRow(
+        column(6,
+          h3("Formulario de Registro"),
+          textInput("nombre", "Nombre Completo*", ""),
+          textInput("cedula", "Número de Cédula*", ""),
+          textInput("email", "Correo Electrónico*", ""),
+          selectInput("carrera", "Carrera*", choices = c("Mecánica Automotriz", "Mecatrónica", "Contabilidad")),
+          actionButton("registrar", "Registrar", class = "btn-primary")
+        ),
+        column(6,
+          h3("Información Importante"),
+          p("Consulta los ", 
+            a("requisitos de titulación", href = "https://example.com/requisitos", target = "_blank"), "."),
+          p("El registro debe ser realizado únicamente por los estudiantes."),
+          p("Fechas límite de registro: ", strong("30 de junio de 2025"), "."),
+          p("Para más información, comuníquese con la facultad a través de nuestro ",
+            a("correo de soporte", href = "mailto:soporte@universidad.edu.ec"), ".")
+        )
+      )
+    ),
+    
+    # Pestaña 2: Encuesta
+    tabPanel("Encuesta",
+      fluidRow(
+        column(12,
+          h3("Encuesta de Satisfacción"),
+          p("Por favor, completa la siguiente encuesta sobre el sistema de registro."),
+          radioButtons("pregunta1", "¿Cómo calificarías el sistema de registro?", 
+                       choices = c("Excelente", "Bueno", "Regular", "Malo")),
+          textAreaInput("comentarios", "Comentarios adicionales:", "", placeholder = "Escribe aquí tus comentarios..."),
+          actionButton("enviar_encuesta", "Enviar Encuesta", class = "btn-success")
+        )
+      )
+    )
+  )
+)
+```
+
+```{r server_librerias, include=FALSE}
+# Lógica del servidor
+server <- function(input, output, session) {
+  # Base de datos reactiva para almacenar registros
+  registros <- reactiveValues(data = data.frame(
+    Nombre = character(), Cedula = character(), Email = character(), Carrera = character(),
+    stringsAsFactors = FALSE
+  ))
+  
+  # Validar y registrar estudiante
+  observeEvent(input$registrar, {
+    if (input$nombre != "" && input$cedula != "" && input$email != "") {
+      # Guardar datos
+      registros$data <- rbind(registros$data, data.frame(
+        Nombre = input$nombre,
+        Cedula = input$cedula,
+        Email = input$email,
+        Carrera = input$carrera,
+        stringsAsFactors = FALSE
+      ))
+      
+      # Mostrar mensaje de éxito
+      showNotification("Registro completado exitosamente. Por favor, completa la encuesta.", type = "message")
+      
+      # Cambiar a la pestaña de Encuesta
+      updateTabsetPanel(session, inputId = "tabs", selected = "Encuesta")
+    } else {
+      showNotification("Por favor, completa todos los campos obligatorios.", type = "error")
+    }
+  })
+  
+  # Manejar envío de encuesta
+  observeEvent(input$enviar_encuesta, {
+    showNotification("Gracias por completar la encuesta.", type = "message")
+  })
+}
+```
+
