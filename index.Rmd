@@ -8,19 +8,39 @@ runtime: shiny
 ---
 
 ```{r setup_librerias, include=FALSE} 
-# Cambié el nombre del chunk a "setup_librerias"
 # Librerías necesarias
 library(shiny)
 library(DT)
+library(shinythemes) # Para usar temas de Bootstrap
 ```
 
-
+```{css styles, echo=FALSE}
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
+  color: #333;
+}
+h3 {
+  color: #007bff;
+}
+.action-button {
+  margin-top: 10px;
+}
+.notification {
+  background-color: #007bff;
+  color: white;
+}
+```
 
 ### Registro de Estudiantes y Encuesta
 
 ```{r}
 # Interfaz de usuario
 fluidPage(
+  theme = shinytheme("cerulean"), # Aplicar un tema de Bootstrap
+  
   titlePanel("Registro de Estudiantes"),
   
   tabsetPanel(id = "tabs",  # Asignar ID a las pestañas para controlarlas dinámicamente
@@ -33,7 +53,7 @@ fluidPage(
           textInput("cedula", "Número de Cédula*", ""),
           textInput("email", "Correo Electrónico*", ""),
           selectInput("carrera", "Carrera*", choices = c("Mecánica Automotriz", "Mecatrónica", "Contabilidad")),
-          actionButton("registrar", "Registrar", class = "btn-primary")
+          actionButton("registrar", "Registrar", class = "btn btn-primary")
         ),
         column(6,
           h3("Información Importante"),
@@ -56,7 +76,7 @@ fluidPage(
           radioButtons("pregunta1", "¿Cómo calificarías el sistema de registro?", 
                        choices = c("Excelente", "Bueno", "Regular", "Malo")),
           textAreaInput("comentarios", "Comentarios adicionales:", "", placeholder = "Escribe aquí tus comentarios..."),
-          actionButton("enviar_encuesta", "Enviar Encuesta", class = "btn-success")
+          actionButton("enviar_encuesta", "Enviar Encuesta", class = "btn btn-success")
         )
       )
     )
@@ -101,4 +121,3 @@ server <- function(input, output, session) {
   })
 }
 ```
-
